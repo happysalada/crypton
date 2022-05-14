@@ -23,8 +23,8 @@
               lld_13
             ] ++ lib.optionals stdenv.isDarwin [
               libiconv
-              darwin.apple_sdk.frameworks.Security
-              darwin.apple_sdk.frameworks.CoreFoundation
+              # darwin.apple_sdk.frameworks.Security
+              # darwin.apple_sdk.frameworks.CoreFoundation
             ];
           };
         };
@@ -60,18 +60,18 @@
             language.rust.enableDefaultToolchain = false;
             packages = with pkgs; [
               clang_13
-              lld_13
+              lld_14
                   
               nodePackages.pnpm
             ] ++ lib.optionals stdenv.isDarwin [
-              # libiconv
+              libiconv
               # darwin.apple_sdk.frameworks.Security
               # darwin.apple_sdk.frameworks.CoreFoundation
             ];
             env = [
               {
                 name = "RUSTFLAGS";
-                value = "\"-C link-arg=-fuse-ld=lld $RUSTFLAGS\"";
+                eval = "\"-C link-arg=-fuse-ld=lld $RUSTFLAGS\"";
               }
               {
                 name = "RUST_LOG";
