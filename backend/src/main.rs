@@ -9,15 +9,19 @@ use axum::{
     routing::get,
     Router,
 };
+use bonsaidb::local::{
+    config::{Builder, StorageConfiguration},
+    AsyncDatabase,
+};
 use std::net::SocketAddr;
 use tower_http::cors::{Any, CorsLayer};
 
 mod schema;
-use crate::schema::{CryptonSchema, MutationRoot, QueryRoot};
+use crate::schema::{DbSchema, GraphqlSchema, MutationRoot, QueryRoot};
 
 const GRAPHQL_URL: &str = "/graphql";
 
-async fn graphql_handler(schema: Extension<CryptonSchema>, req: GraphQLRequest) -> GraphQLResponse {
+async fn graphql_handler(schema: Extension<GraphqlSchema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
 
@@ -32,12 +36,12 @@ async fn main() {
     // initialize tracing
     tracing_subscriber::fmt::init();
 
-    // let db = SqlitePool::connect(&std::env::var("DATABASE_URL").expect("DATABASE_URL is not set"))
-    //     .await
-    //     .expect("failed to get a db connection");
+    let db = AsyncDatabase::open::<DbSchema>(StorageConfiguration::new("db.bonsaidb"))
+        .await
+        .expect("could not open db.bonsaidb");
 
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
-        .data(())
+        .data(db)
         .finish();
 
     let cors = CorsLayer::new()
