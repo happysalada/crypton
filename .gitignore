@@ -2,6 +2,8 @@
 backend/target/
 frontend/node_modules/
 frontend/.svelte-kit/
+demo/.svelte-kit/
+demo/node_modules/
 
 .direnv/
 .env.*
