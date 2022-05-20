@@ -3,14 +3,7 @@
 /// <reference types="vite/client" />
 
 
-// export type DropEvent {
-//   detail: {
-//     acceptedFiles: File[],
-//     fileRejections: File[]
-//   }
-// }
+interface ImportMetaEnv {
+  VITE_INFURA_ID: string;
+}
 
-// export type FileState {
-//   accepted: File[],
-//   rejected: File[]
-// }

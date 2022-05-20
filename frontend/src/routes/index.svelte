@@ -1,14 +1,18 @@
 <script lang="ts">
-	let mobileMenuOpen = false;
+  import { selectedAccount, connected } from 'svelte-web3'
+	import { goto } from "$app/navigation"
+  import Web3Modal from '$lib/Web3Modal.svelte'
 
-	async function submitForm(event: Event) {
-		event.preventDefault();
-		console.log("trying to log in");
-	}
+	let mobileMenuOpen = false;
 
   function toggleMobileMenu() {
     mobileMenuOpen = !mobileMenuOpen
   }
+	
+	if ($connected && $selectedAccount) {
+		goto("/dashboard")
+	}
+
 </script>
 
 <div class="relative bg-gray-50 overflow-hidden h-screen">
@@ -94,7 +98,7 @@
 					<div class="flex items-center flex-1 md:absolute md:inset-y-0 md:left-0">
 						<div class="flex items-center justify-between w-full md:w-auto">
 							<a href="/">
-								<span class="sr-only">Workflow</span>
+								<span class="sr-only">Crypton</span>
 								<img
 									class="h-8 w-auto sm:h-10"
 									src="untitled.svg"
@@ -141,12 +145,7 @@
 						class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0"
 					>
 						<span class="inline-flex rounded-md shadow">
-							<a
-								href="#"
-								class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50"
-							>
-								Log in
-							</a>
+							<Web3Modal />
 						</span>
 					</div>
 				</nav>
