@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { selectedAccount, connected, chainData } from "svelte-web3";
-	import Web3Modal from "$lib/Web3Modal.svelte";	// import { goto } from "$app/navigation";
+	import Web3Modal from "$lib/Web3Modal.svelte";
 
-	// if (!$connected || !$selectedAccount) {
-	// 	goto("/");
-	// }
 	let totalAmount = 642.60;
 </script>
 

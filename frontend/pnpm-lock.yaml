@@ -6,6 +6,7 @@ specifiers:
   '@tailwindcss/forms': ^0.5.2
   autoprefixer: ^10.4.7
   cssnano: ^5.1.8
+  decimal.js: ^10.3.1
   dotenv: ^16.0.1
   postcss: ^8.4.14
   postcss-import: ^14.1.0
@@ -24,6 +25,7 @@ specifiers:
 
 dependencies:
   '@tailwindcss/forms': 0.5.2_tailwindcss@3.0.24
+  decimal.js: 10.3.1
   dotenv: 16.0.1
   svelte-web3: 3.4.1
   web3modal: 1.9.7
@@ -806,6 +808,10 @@ packages:
     dependencies:
       ms: 2.1.2
       supports-color: 5.5.0
+    dev: false
+
+  /decimal.js/10.3.1:
+    resolution: {integrity: sha512-V0pfhfr8suzyPGOx3nmq4aHqabehUZn6Ch9kyFpV79TGDTWFmHqUqXdabR7QHqxzrYolF4+tVmJhUG4OURg5dQ==}
     dev: false
 
   /deepmerge/4.2.2:

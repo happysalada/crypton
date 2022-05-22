@@ -1,10 +1,42 @@
 <script lang="ts">
-	import { selectedAccount, connected, chainData } from "svelte-web3";
+	import { selectedAccount, chainId, connected, chainData, web3 } from "svelte-web3";
+	import Decimal from "decimal.js";
+
 	import { goto } from "$app/navigation";
+	import { variables } from "$lib/variables"
 
 	if (!$connected || !$selectedAccount) {
 		goto("/");
 	}
+	
+	const transactions = $chainId === 80001 ? fetch(`https://api-testnet.polygonscan.com/api?module=account&action=txlist&address=${$selectedAccount}&startblock=0&endblock=99999999&page=1&offset=10&sort=asc&apikey=${variables.polygonScanApiKey}`)
+		.then(response => response.json())
+		.then(({result, status}) => {
+			if (status == 1) {
+				return result
+			}
+		}) : Promise.resolve([])
+
+	const symbolPrice = fetch(
+		`https://api.covalenthq.com/v1/pricing/tickers/?quote-currency=USD&format=JSON&tickers=${
+			$chainData?.nativeCurrency?.symbol || "ETH"
+		}&key=${variables.covalentApiKey}` 
+	)
+		.then((response) => response.json())
+		.then((json) => {
+			const { data, error } = json;
+			if (error) {
+				console.log(json.error_code)
+				console.log(json.error_message)
+			} else {
+				const { items } = data;
+				if (items[0]) {
+					return new Decimal(items[0].quote_rate);
+				} else {
+					return new Decimal(1)
+				}
+			}
+		});
   
   let filter: string
 </script>
@@ -146,34 +178,67 @@
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-200 bg-white">
-							<tr>
-								<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
-									>AAPS0L</td
-								>
-								<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
-									>2022/05/22</td
-								>
-								<td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900"
-									>Chase &amp; Co.</td
-								>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900"
-									>{$chainData.nativeCurrency.symbol}</td
-								>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">4.37</td>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">Couch</td>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">1.00</td>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">$4,397.00</td>
-								<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">Confirmed</td>
-								<td
-									class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
-								>
-									<a href="#" class="text-indigo-600 hover:text-indigo-900"
-										>Edit<span class="sr-only">, AAPS0L</span></a
+							{#await Promise.all([transactions, symbolPrice])}
+								<tr>
+									<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
+										>pending</td
 									>
-								</td>
-							</tr>
+									<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
+										>pending</td
+									>
+									<td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900"
+										>pending</td
+									>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900"
+										>pending</td
+									>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">pending</td>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">pending</td>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">pending</td>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">pending</td>
+									<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">pending</td>
+									<td
+										class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+									>
+										<a href="#" class="text-indigo-600 hover:text-indigo-900"
+											>Edit<span class="sr-only">, AAPS0L</span></a
+										>
+									</td>
+								</tr>
+							{:then [payments, symbolPrice]}
+								{#each payments.sort((a, b) => b.timeStamp - a.timeStamp) as {from, hash, timeStamp, value, transactionIndex}}
+									{@const date = new Date(parseInt(timeStamp) * 1000) }
+									{@const transactionAmount = $web3.utils.fromWei(value) }
+									<tr>
+										<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
+											>{hash.substring(0,5)}...{hash.substring(hash.length - 5)}</td
+										>
 
-							<!-- More transactions... -->
+										<td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-6"
+											>{date.getFullYear()}/{String(date.getMonth()).padStart(2, "0")}/{String(date.getDate()).padStart(2, "0")} {String(date.getHours()).padStart(2, "0")}:{String(date.getMinutes()).padStart(2, "0")}</td
+										>
+										<td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900"
+											>{from.substring(0, 5)}...{from.substring(from.length - 5)}</td
+										>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900"
+											>{$chainData.nativeCurrency.symbol}</td
+										>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{Number(transactionAmount).toPrecision(2)}</td>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">Couch</td>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">1.00</td>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">${(new Decimal(transactionAmount)).mul(symbolPrice).toPrecision(2)}</td>
+										<td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{transactionIndex != 0 ? "Confirmed" : "Pending" }</td>
+										<td
+											class="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+										>
+											<a href="#" class="text-indigo-600 hover:text-indigo-900"
+												>Edit<span class="sr-only">, AAPS0L</span></a
+											>
+										</td>
+									</tr>
+								{/each}
+							{/await}
+
 						</tbody>
 					</table>
 				</div>
