@@ -175,13 +175,13 @@ export const chains = [ {
 		{
 			name: "zkSync alpha testnet",
 			title: "zkSync testnet",
-			chainId: 421611,
+			chainId: 280,
 			shortName: "zksync-testnet",
 			chain: "ETH",
 			networkId: 280,
 			nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
 			rpc: ["https://zksync2-testnet.zksync.dev"],
-			infoURL: "https://arbitrum.io",
+			infoURL: "https://v2-docs.zksync.io/dev/testnet/important-links.html",
       assetSrc: "https://defillama.com/chain-icons/rsz_zksync.jpg",
 			explorers: [
 				{

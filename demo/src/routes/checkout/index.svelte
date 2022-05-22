@@ -5,6 +5,7 @@
 	// if (!$connected || !$selectedAccount) {
 	// 	goto("/");
 	// }
+	let totalAmount = 642.60;
 </script>
 
 <div class="bg-white">
@@ -32,11 +33,10 @@
 
 				<dl>
 					<dt class="text-sm font-medium">Amount due</dt>
-					<dd class="mt-1 text-3xl font-extrabold text-white">$642.60</dd>
+					<dd class="mt-1 text-3xl font-extrabold text-white">${totalAmount}</dd>
 				</dl>
 
 				<ul
-					role="list"
 					class="text-sm font-medium divide-y divide-white divide-opacity-10"
 				>
 					<li class="flex items-start py-6 space-x-4">
@@ -200,7 +200,7 @@
 
 					<div class="mt-10">
 						<h3 class="text-lg font-medium text-gray-900 mb-4">Payment</h3>
-						<Web3Modal />
+						<Web3Modal {totalAmount}/>
 					</div>
 
 				</div>
