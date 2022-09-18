@@ -39,7 +39,7 @@
       nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = self.overlays; });
     in
     {
-      overlays = [ rust-overlay.overlay package_overlay devshell.overlay ];
+      overlays = [ rust-overlay.overlays.default package_overlay devshell.overlay ];
       packages = forAllSystems (system:
         {
           inherit (nixpkgsFor.${system}) vf-backend;
@@ -59,7 +59,7 @@
             imports = [ "${devshell}/extra/language/rust.nix"];
             language.rust.enableDefaultToolchain = false;
             packages = with pkgs; [
-              clang_13
+              clang_14
               lld_14
                   
               nodePackages.pnpm
